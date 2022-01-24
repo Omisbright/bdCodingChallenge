@@ -1,21 +1,43 @@
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Provider } from 'react-redux';
+import { NavigationContainer } from '@react-navigation/native';
+import { store } from './src/state-management/store';
+import MyTab from './src/navigation/main-navigation';
+import { SafeAreaProvider, SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { View } from 'react-native';
+import { PersistGate } from 'redux-persist/integration/react';
+import { persistStore } from 'redux-persist';
+
+let persistor = persistStore(store);
 
 export default function App() {
+
+  const CustomStatusBar = ({backgroundColor, barStyle = 'dark-content'}) => {
+
+    const insets = useSafeAreaInsets();
+  
+    return (
+      <View style={{height: insets.top, backgroundColor}}>
+        <StatusBar
+          barStyle={barStyle}
+          animated={true}
+          backgroundColor={backgroundColor}
+        />
+      </View>
+    )
+  }
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <SafeAreaProvider>
+      <Provider store={ store }>
+        <PersistGate loading={ null } persistor={ persistor }>
+          <NavigationContainer>
+            <CustomStatusBar backgroundColor="#fff"/>
+            <MyTab />
+          </NavigationContainer>
+        </PersistGate>
+      </Provider>
+    </SafeAreaProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
